@@ -149,9 +149,9 @@ def create_input_arrays(
     """load images and encode captions text"""
 
     image = load_images(dataset[0], 256, 256)
-    captions_encoded, lengthes = encode_captions(dataset[1]["captions"], vocab)
+    captions_encoded, lengths = encode_captions(dataset[1]["captions"], vocab)
 
-    return image, captions_encoded, lengthes
+    return image, captions_encoded, lengths
 
 
 def run_create_arrays(
@@ -171,6 +171,6 @@ def run_create_arrays(
                  desc=f"Preparing {split} Dataset",
                  unit="Image"))
 
-    images, captions_encoded, lengthes = zip(*arrays)
+    images, captions_encoded, lengths = zip(*arrays)
 
-    return np.stack(images), captions_encoded, lengthes
+    return np.stack(images), captions_encoded, lengths

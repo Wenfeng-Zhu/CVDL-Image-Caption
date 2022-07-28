@@ -15,13 +15,13 @@ def parse_arguments() -> Namespace:
 
     parser.add_argument("--dataset_dir",
                         type=str,
-                        default="/srv/data/guszarzmo/mlproject/data/mscoco_h5",
+                        default="datasets-processed",
                         help="Directory contains processed MS COCO dataset.")
 
     parser.add_argument(
         "--config_path",
         type=str,
-        default="code/config.json",  # noqa: E501
+        default="config.json",  # noqa: E501
         help="Path for the configuration json file.")
 
     parser.add_argument(

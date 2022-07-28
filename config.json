@@ -1,0 +1,47 @@
+{
+    "hyperparams": {
+        "image_encoder": {
+            "encode_size": 14,
+            "embed_dim": 512
+        },
+        "transformer": {
+            "d_model": 512,
+            "enc_ff_dim": 512,
+            "dec_ff_dim": 2048,
+            "enc_n_layers": 2,
+            "dec_n_layers": 4,
+            "enc_n_heads": 8,
+            "dec_n_heads": 8,
+            "dropout": 0.1
+        }
+    },
+    "paths": {
+        "embedding_path": "embeddings",
+        "checkpoint": "checkpoints"
+    },
+    "dataloader_params": {
+        "batch_size": 32,
+        "shuffle": true,
+        "num_workers": 4
+    },
+    "train_params": {
+        "epochs": 100,
+        "val_interval": 2,
+        "early_stop": 10,
+        "lr_patience": 5,
+        "embeddings_finetune": 10,
+        "grad_clip": 5.0,
+        "lambda_c": 1.0
+    },
+    "optim_params": {
+        "encoder_lr": 1e-4,
+        "transformer_lr": 1e-4,
+        "lr_factors": [
+            0.75,
+            0.75
+        ]
+    },
+    "max_len": 52,
+    "min_freq": 3,
+    "seed": 9001
+}
