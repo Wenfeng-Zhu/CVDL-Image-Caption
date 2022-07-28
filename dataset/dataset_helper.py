@@ -10,8 +10,7 @@ from tqdm import tqdm
 import re
 
 import numpy as np
-from torchtext.vocab import vocab
-# Todo: the About the compatibility of Vocab constructs after version 0.9 of vocab.
+from torchtext.vocab import Vocab
 
 from sklearn.model_selection import train_test_split
 
@@ -77,7 +76,7 @@ def load_images(image_path: str,
 
 
 def encode_captions(captions: List[List[str]],
-                    vocab: vocab) -> Tuple[List[List[int]], List[int]]:
+                    vocab: Vocab) -> Tuple[List[List[int]], List[int]]:
     """Encode captions text to the respective indices"""
     encoded = []
     lengthes = []
@@ -89,11 +88,11 @@ def encode_captions(captions: List[List[str]],
 
 
 def split_dataset(
-        original_train_split: ImagesAndCaptions,
-        original_val_split: ImagesAndCaptions,
-        SEED: int,
-        test_perc: int = 0.15,
-        val_perc: int = 0.15
+    original_train_split: ImagesAndCaptions,
+    original_val_split: ImagesAndCaptions,
+    SEED: int,
+    test_perc: int = 0.15,
+    val_perc: int = 0.15
 ) -> Tuple[ImagesAndCaptions, ImagesAndCaptions, ImagesAndCaptions]:
     """The size of the original validation split is 4% of the dataset. The
         function calculate the remaining percentage to have a test set of size
@@ -131,22 +130,22 @@ def split_dataset(
 def build_vocab(captions: List[chain],
                 vector_dir: str,
                 vector_name: str,
-                min_freq: int = 2) -> vocab:
+                min_freq: int = 2) -> Vocab:
     all_words = list(chain.from_iterable(captions))  # Type: List[str]
     bag_of_words: BOW = Counter(all_words)
 
-    Vocab = vocab(bag_of_words,
+    vocab: Vocab = Vocab(bag_of_words,
                          min_freq=min_freq,
                          specials=("<unk>", "<pad>", "<sos>", "<eos>"),
                          vectors_cache=vector_dir,
                          vectors=vector_name,
                          unk_init=init_unk)
-    return Vocab
+    return vocab
 
 
 def create_input_arrays(
         dataset: Tuple[str, Captions],
-        vocab: vocab) -> Tuple[NDArray, List[List[int]], List[int]]:
+        vocab: Vocab) -> Tuple[NDArray, List[List[int]], List[int]]:
     """load images and encode captions text"""
 
     image = load_images(dataset[0], 256, 256)
@@ -156,12 +155,13 @@ def create_input_arrays(
 
 
 def run_create_arrays(
-        dataset: ImagesAndCaptions,
-        vocab: vocab,
-        split: str,
-        num_proc: int = 4
+    dataset: ImagesAndCaptions,
+    vocab: Vocab,
+    split: str,
+    num_proc: int = 4
 ) -> Tuple[NDArray, List[List[List[int]]], List[List[int]]]:
-    # Prepare arrays: images, captions encoded and captions lenghtes
+
+    # Prepare arrays: images, captions encoded and captions length
     f = partial(create_input_arrays, vocab=vocab)
     num_proc = mp.cpu_count()
     with mp.Pool(processes=num_proc) as pool:

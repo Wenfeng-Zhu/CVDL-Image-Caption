@@ -74,8 +74,9 @@ if __name__ == "__main__":
     for ds, split in zip([train_ds, val_ds, test_ds],
                          ["train", "val", "test"]):
         # create arrays
+        a = 2
         arrs = run_create_arrays(dataset=ds, vocab=vocab, split=split)
-        images, captions_encoded, lengthes = arrs
+        images, captions_encoded, lengths = arrs
         print(f"Number of samples in the {split} split:   {images.shape[0]}")
 
         # saving dataset
@@ -87,9 +88,9 @@ if __name__ == "__main__":
 
         write_json(str(output_dir / f"{split}_captions.json"),
                    captions_encoded)
-        write_json(str(output_dir / f"{split}_lengthes.json"), lengthes)
+        write_json(str(output_dir / f"{split}_lengths.json"), lengths)
         print(f"Saving {split} dataset finished.\n")
-
     torch.save(vocab, str(output_dir / "vocab.pth"))
 
-print("\nCreating dataset files finished.\n")
+
+# print("\nCreating dataset files finished.\n")

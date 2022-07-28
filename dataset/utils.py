@@ -38,13 +38,13 @@ def parse_arguments() -> Namespace:
     parser.add_argument(
         "--image_train",
         type=str,
-        default="train2017/",
+        default="train2017",
         help="Directory have MS COCO images files for the train split.")
 
     parser.add_argument(
         "--image_val",
         type=str,
-        default="val2017/",
+        default="val2017",
         help="Directory have MS COCO image files for the val split.")
 
     parser.add_argument(
