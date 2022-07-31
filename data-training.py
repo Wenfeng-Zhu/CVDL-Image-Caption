@@ -87,7 +87,7 @@ if __name__ == "__main__":
                           collate_fn=collate_padd(max_len, pad_id),
                           batch_size=1,
                           pin_memory=True,
-                          num_workers=1,
+                          num_workers=0,
                           shuffle=True)
     print("loading dataset finished.")
     print(f"number of vocabulary is {vocab_size}\n")

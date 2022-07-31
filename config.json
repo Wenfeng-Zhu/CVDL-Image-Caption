@@ -22,10 +22,10 @@
     "dataloader_params": {
         "batch_size": 32,
         "shuffle": true,
-        "num_workers": 2
+        "num_workers": 0
     },
     "train_params": {
-        "epochs": 20,
+        "epochs": 5,
         "val_interval": 2,
         "early_stop": 10,
         "lr_patience": 5,
