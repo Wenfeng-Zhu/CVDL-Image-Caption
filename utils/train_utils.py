@@ -11,7 +11,7 @@ import torch
 
 def parse_arguments() -> Namespace:
     parser = argparse.ArgumentParser(
-        description="LT2326 H21 Mohamed's Project")
+        description="CVDL-2022-LMU Project")
 
     parser.add_argument("--dataset_dir",
                         type=str,

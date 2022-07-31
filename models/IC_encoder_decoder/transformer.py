@@ -195,8 +195,7 @@ class Transformer(nn.Module):
 
         attn_all:       Attension weights
                         Tensor
-                        [layer_num, batch_size, head_num, max_len,
-                        encode_size^2]
+                        [layer_num, batch_size, head_num, max_len, encode_size^2]
                         See comments in decoder_layers.DecoderLayer
         """
         # encode, decode, predict

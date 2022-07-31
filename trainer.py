@@ -17,6 +17,7 @@ from utils.custom_types import SchedulerType
 from utils.train_utils import seed_everything
 
 
+
 class TrackMetrics:
 
     def __init__(self) -> None:
@@ -354,7 +355,7 @@ class Trainer():
                 lens: Tensor  # lengthes of all captions [B, cn]
 
                 # set progress bar description and metrics
-                pb.set_description(f"{phases[self.train]}: Step-{step+1:<4d}")
+                pb.set_description(f"{phases[self.train]}: Step-{step + 1:<4d}")
 
                 # move data to device, and random selected cptns
                 imgs = imgs.to(self.device)

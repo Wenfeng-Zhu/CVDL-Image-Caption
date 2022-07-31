@@ -66,8 +66,7 @@ class DecoderLayer(nn.Module):
 
         attn:           Attension weights
                         Tensor
-                        [layer_num, batch_size, head_num, max_len,
-                        encode_size^2]
+                        [layer_num, batch_size, head_num, max_len, encode_size^2]
                         To be able to do so, I have changed the code at
                         /.virtualenvs/<env_name>/lib/python3.8/site-packages/torch/nn/functional.py
                         line 4818 and changed
