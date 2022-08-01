@@ -9,7 +9,7 @@ from torch.optim.lr_scheduler import StepLR
 from models.cnn_encoder import ImageEncoder
 from models.IC_encoder_decoder.transformer import Transformer
 
-from dataset.dataloader import HDF5Dataset, collate_padd
+from dataset_functional.dataloader import HDF5Dataset, collate_padd
 from torchtext.vocab import Vocab
 
 from trainer import Trainer
@@ -17,20 +17,20 @@ from utils.train_utils import parse_arguments, seed_everything, load_json
 from utils.gpu_cuda_helper import select_device
 
 
-def get_datasets(dataset_dir: str, pid_pad: float):
+def load_datasets(dataset_processed_dir: str, pid_pad: float):
     # Setting some paths
-    dataset_dir = Path(dataset_dir)
-    images_train_path = dataset_dir / "train_images.hdf5"
-    images_val_path = dataset_dir / "val_images.hdf5"
-    captions_train_path = dataset_dir / "train_captions.json"
-    captions_val_path = dataset_dir / "val_captions.json"
-    lengths_train_path = dataset_dir / "train_lengths.json"
-    lengths_val_path = dataset_dir / "val_lengths.json"
+    dataset_processed_dir = Path(dataset_processed_dir)
+    images_train_path = dataset_processed_dir / "train_images.hdf5"
+    images_val_path = dataset_processed_dir / "val_images.hdf5"
+    captions_train_path = dataset_processed_dir / "train_captions.json"
+    captions_val_path = dataset_processed_dir / "val_captions.json"
+    lengths_train_path = dataset_processed_dir / "train_lengths.json"
+    lengths_val_path = dataset_processed_dir / "val_lengths.json"
 
     # images transform
     norm = Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
     transform = Compose([norm])
-
+    # load datasets with HDF5
     train_dataset = HDF5Dataset(hdf5_path=images_train_path,
                                 captions_path=captions_train_path,
                                 lengthes_path=lengths_train_path,
@@ -73,12 +73,12 @@ if __name__ == "__main__":
     seed_everything(SEED)
 
     # --------------- dataloader --------------- #
-    print("loading dataset...")
+    print("loading processed dataset...")
     g = torch.Generator()
     g.manual_seed(SEED)
     loader_params = config["dataloader_params"]
     max_len = config["max_len"]
-    train_ds, val_ds = get_datasets(dataset_dir, pad_id)
+    train_ds, val_ds = load_datasets(dataset_dir, pad_id)
     train_iter = DataLoader(train_ds,
                             collate_fn=collate_padd(max_len, pad_id),
                             pin_memory=True,
@@ -89,7 +89,7 @@ if __name__ == "__main__":
                           pin_memory=True,
                           num_workers=0,
                           shuffle=True)
-    print("loading dataset finished.")
+    print("loading processed dataset finished.")
     print(f"number of vocabulary is {vocab_size}\n")
 
     # --------------- Construct models, optimizers --------------- #

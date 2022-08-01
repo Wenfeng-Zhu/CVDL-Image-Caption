@@ -11,12 +11,12 @@ import torch
 
 def parse_arguments() -> Namespace:
     parser = argparse.ArgumentParser(
-        description="CVDL-2022-LMU Project")
+        description="LMU-SS2022-CVDL-Project")
 
     parser.add_argument("--dataset_dir",
                         type=str,
                         default="datasets-processed",
-                        help="Directory contains processed MS COCO dataset.")
+                        help="Directory contains processed MS COCO datasets.")
 
     parser.add_argument(
         "--config_path",

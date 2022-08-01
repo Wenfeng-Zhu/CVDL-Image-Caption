@@ -1,5 +1,5 @@
 import os
-from dataset.custom_types import ImagesAndCaptions
+from dataset_functional.customised_data_types import ImagesAndCaptions
 from argparse import Namespace
 
 from pathlib import Path
@@ -8,21 +8,20 @@ from itertools import chain
 import torch
 
 from utils.train_utils import seed_everything
-from dataset.utils import parse_arguments, load_json, write_h5_dataset
-from dataset.utils import write_json
-from dataset.dataset_helper import get_captions, combine_image_captions
-from dataset.dataset_helper import run_create_arrays
-from dataset.dataset_helper import split_dataset, build_vocab
+from dataset_functional.utils import parse_arguments, load_json, write_h5_dataset
+from dataset_functional.utils import write_json
+from dataset_functional.dataset_processor import get_captions, combine_image_captions
+from dataset_functional.dataset_processor import run_create_arrays
+from dataset_functional.dataset_processor import split_dataset, build_vocab
 
 
-def get_data(json_path: str,
-             imgs_dir: str,
-             max_len: int = 52) -> ImagesAndCaptions:
-    """Load annations json file and return a images ids with its captions in
-        the following format:
-            image_name: {image_id: list of captions tokens}
+def load_data(json_path: str,
+              imgs_dir: str,
+              max_len: int = 52) -> ImagesAndCaptions:
     """
-
+    Load annotations json file and return an images ids with its captions in the following format:
+        image_name: {image_id: list of captions tokens}
+    """
     annotations, images_id = load_json(json_path)
     captions = get_captions(annotations, max_len)
     images_w_captions = combine_image_captions(images_id, captions, imgs_dir)
@@ -32,6 +31,7 @@ def get_data(json_path: str,
 
 if __name__ == "__main__":
 
+    """Set random seeds to ensure the same initialization for each training"""
     SEED = 9001
     seed_everything(seed=SEED)
 
@@ -39,17 +39,20 @@ if __name__ == "__main__":
     args = parse_arguments()  # type: Namespace
 
     # process some directories
-    ds_dir = Path(os.path.expanduser(args.dataset_dir))
-    output_dir = Path(os.path.expanduser(args.output_dir))
+    ds_dir = Path(os.path.expanduser(args.dataset_dir))  # original dataset path
+    output_dir = Path(os.path.expanduser(args.output_dir))  # output path
     train_ann_path = str(ds_dir / args.json_train)  # train annotations path
-    val_ann_path = str(ds_dir / args.json_val)  # val annotations path
+    val_ann_path = str(ds_dir / args.json_val)  # validation annotations path
     train_imgs_dir = str(ds_dir / args.image_train)  # train images path
-    val_imgs_dir = str(ds_dir / args.image_val)  # val images path
+    val_imgs_dir = str(ds_dir / args.image_val)  # validation images path
     output_dir.mkdir(parents=True, exist_ok=True)
-    # torchtext.vocab
-    # Vector must be one of the vectors supoorted by
-    # torchtext.vocab.Vectors classes
-    # https://github.com/pytorch/text/blob/0169cde2f1d446ae886ef0be07e9a673585ed256/torchtext/vocab.py#L151
+
+    """
+    torchtext.vocab
+    Vector must be one of the vectors supported by
+    torchtext.vocab.Vectors classes
+    https://github.com/pytorch/text/blob/0169cde2f1d446ae886ef0be07e9a673585ed256/torchtext/vocab.py#L151
+    """
 
     vector_dir = Path(os.path.expanduser(args.vector_dir))
     vector_name = list(vector_dir.glob("*.zip"))  # dir must have one zip file
@@ -57,29 +60,28 @@ if __name__ == "__main__":
 
     # process annotation files
     print("Process annotation files...")
-    images_captions = get_data(train_ann_path, train_imgs_dir, args.max_len)
-    images_captions_test = get_data(val_ann_path, val_imgs_dir)
+    images_captions = load_data(train_ann_path, train_imgs_dir, args.max_len)
+    images_captions_test = load_data(val_ann_path, val_imgs_dir)
 
     # split data
     train_ds, val_ds, test_ds = split_dataset(images_captions,
                                               images_captions_test, SEED)
 
-    # Create vocab from train dataset set OOV to <UNK>, then encode captions
+    # Create vocab from train dataset_functional set OOV to <UNK>, then encode captions
     captions = [chain.from_iterable(d["captions"]) for d in train_ds.values()]
     vocab = build_vocab(captions, str(vector_dir), vector_name, args.min_freq)
     print("Processing finished.\n")
 
-    # Create numpy arrays for images, list of list of list of str for captions
-    # after encoding them and list of list for captions lengthes then save them
+    # Create numpy arrays for images, three-level structured dictionary of str for captions
+    # After encoding them and list of list for captions lengths then save them
     for ds, split in zip([train_ds, val_ds, test_ds],
                          ["train", "val", "test"]):
         # create arrays
         a = 2
-        arrs = run_create_arrays(dataset=ds, vocab=vocab, split=split)
-        images, captions_encoded, lengths = arrs
+        images, captions_encoded, lengths = run_create_arrays(dataset=ds, vocab=vocab, split=split)
         print(f"Number of samples in the {split} split:   {images.shape[0]}")
 
-        # saving dataset
+        # saving dataset_processed
         print(f"Saving {split} dataset ...")
         write_h5_dataset(write_path=str(output_dir / f"{split}_images.hdf5"),
                          name=split,
@@ -91,6 +93,4 @@ if __name__ == "__main__":
         write_json(str(output_dir / f"{split}_lengths.json"), lengths)
         print(f"Saving {split} dataset finished.\n")
     torch.save(vocab, str(output_dir / "vocab.pth"))
-
-
-# print("\nCreating dataset files finished.\n")
+    print("\nCreating dataset_functional files finished.\n")

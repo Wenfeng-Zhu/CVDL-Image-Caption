@@ -17,7 +17,6 @@ from utils.custom_types import SchedulerType
 from utils.train_utils import seed_everything
 
 
-
 class TrackMetrics:
 
     def __init__(self) -> None:
@@ -111,13 +110,14 @@ class Trainer():
             time_tag = str(datetime.now().strftime("%d%m.%H%M"))
         else:
             time_tag = Path(resume).parent
+            print(time_tag)
         # Tensorboard writer
         self.logger = SummaryWriter(log_dir=f"logs/exp_{time_tag}/logs")
         self.loss_logger = SummaryWriter(log_dir=f"logs/exp_{time_tag}/loss")
         self.bleu4_logger = SummaryWriter(log_dir=f"logs/exp_{time_tag}/bleu4")
         self.gleu_logger = SummaryWriter(log_dir=f"logs/exp_{time_tag}/gleu")
 
-        # make folder for the experment
+        # make folder for the experiment
         checkpoints_path = Path(checkpoints_path) / f"{time_tag}"  # type: Path
         checkpoints_path.mkdir(parents=True, exist_ok=True)
         self.checkpoints_path = str(checkpoints_path)
@@ -141,7 +141,7 @@ class Trainer():
         # Reduction: Would it make any difference if I sum across
         # (encode_size^2, and head) dimensions and average across batch and
         # layers?
-        alphas = self.lc * (1. - attns.sum(dim=3).view(ln, hn, -1))**2
+        alphas = self.lc * (1. - attns.sum(dim=3).view(ln, hn, -1)) ** 2
         alphas: Tensor
         dsar = alphas.mean(-1).sum()
 
@@ -217,7 +217,7 @@ class Trainer():
         return is_better, reduce_lr, es
 
     def load_checkpoint(self):
-        load_path = str(Path(self.checkpoints_path) / self.resume)
+        load_path = str(Path(self.checkpoints_path).parent / self.resume)
 
         # load checkpoint
         state = torch.load(load_path, map_location=torch.device("cpu"))
@@ -313,6 +313,7 @@ class Trainer():
         seed_everything(SEED)
         if self.resume:
             model_state_dicts = self.load_checkpoint()
+            print("load the resume.")
             img_embeder.load_state_dict(model_state_dicts[0])
             transformer.load_state_dict(model_state_dicts[1])
 
@@ -324,7 +325,7 @@ class Trainer():
         main_pb = tqdm(range(self.epochs_num))
         while self.epoch <= self.epochs_num:
 
-            main_pb.set_description(f"epoch: {self.epoch:02d}")
+            main_pb.set_description(f"epoch: {self.epoch + 1:02d}")
 
             is_best = False
             es = False  # early stopping
@@ -347,6 +348,7 @@ class Trainer():
 
             # Iterate over data
             # prgress bar
+            data_iter
             pb = tqdm(data_iter, leave=False, total=len(data_iter))
             pb.unit = "step"
             for step, (imgs, cptns_all, lens) in enumerate(pb):

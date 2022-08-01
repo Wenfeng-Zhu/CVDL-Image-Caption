@@ -1,5 +1,6 @@
 from torch import nn, Tensor
 import torchvision
+from torchvision.models import ResNet101_Weights
 
 
 class ImageEncoder(nn.Module):
@@ -18,7 +19,7 @@ class ImageEncoder(nn.Module):
         self.embed_dim = embed_dim
         # pretrained ImageNet ResNet-101
         # Remove last linear and pool layers
-        resnet = torchvision.models.resnet101(pretrained=True)
+        resnet = torchvision.models.resnet101(weights=ResNet101_Weights.DEFAULT)
         self.resnet = nn.Sequential(*list(resnet.children())[:-2])
 
         self.downsampling = nn.Conv2d(in_channels=2048,

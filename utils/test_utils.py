@@ -9,7 +9,7 @@ def parse_arguments() -> Namespace:
     parser.add_argument("--dataset_dir",
                         type=str,
                         default="/srv/data/guszarzmo/mlproject/data/mscoco_h5",
-                        help="Directory contains processed MS COCO dataset.")
+                        help="Directory contains processed MS COCO dataset_functional.")
 
     parser.add_argument("--save_dir",
                         type=str,
