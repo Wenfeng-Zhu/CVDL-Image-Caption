@@ -1,7 +1,7 @@
 # CVDL-Image-Caption
 ## TodoList
 1. [ ] Selection of dataset
-2. [ ] Pre-processing of dataset
+2. [ ] re-processing of dataset
 - 源数据说明——>图片划分
 - 字幕——>裁剪，制作vocab，词向量嵌入，
 3. [ ] Model construction
