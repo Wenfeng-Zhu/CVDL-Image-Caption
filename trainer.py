@@ -97,7 +97,7 @@ class Trainer():
         # metrics tracker with it.
         # - Move tracker to Metrics class.
         # metrics functions and tracker
-        self.nlgmetrics = Metrics()
+        self.nlgMetrics = Metrics()
         self.metrics_tracker = TrackMetrics()
         self.best_metric = 0
 
@@ -121,8 +121,7 @@ class Trainer():
         checkpoints_path.mkdir(parents=True, exist_ok=True)
         self.checkpoints_path = str(checkpoints_path)
 
-    def loss_fn(self, logits: Tensor, targets: Tensor,
-                attns: Tensor) -> Tensor:
+    def loss_fn(self, logits: Tensor, targets: Tensor, attns: Tensor) -> Tensor:
         v_sz = logits.size()[-1]
         targets = targets.contiguous()
         loss = self.criterion(logits.view(-1, v_sz), targets.view(-1))
@@ -185,7 +184,7 @@ class Trainer():
         refs = self.remove_pad(gtruth, lens, mask)
         hypos = self.remove_pad(preds, lens[:, 0], mask[:, :, 0])
 
-        scores = self.nlgmetrics.calculate(refs, hypos, self.train)
+        scores = self.nlgMetrics.calculate(refs, hypos, self.train)
 
         return scores
 
@@ -321,10 +320,10 @@ class Trainer():
         transformer = transformer.to(self.device)
 
         # start
-        main_pb = tqdm(range(self.epochs_num))
+        main_pb = tqdm(range(1, self.epochs_num + 1))
         while self.epoch <= self.epochs_num:
 
-            main_pb.set_description(f"epoch: {self.epoch + 1:02d}")
+            main_pb.set_description(f"epoch: {(self.epoch + 1):02d}")
 
             is_best = False
             es = False  # early stopping
@@ -346,14 +345,14 @@ class Trainer():
                 data_iter = data_iters[1]
 
             # Iterate over data
-            # prgress bar
+            # progress bar
             data_iter
             pb = tqdm(data_iter, leave=False, total=len(data_iter))
             pb.unit = "step"
             for step, (imgs, cptns_all, lens) in enumerate(pb):
                 imgs: Tensor  # images [B, 3, 256, 256]
                 cptns_all: Tensor  # all 5 captions [B, lm, cn=5]
-                lens: Tensor  # lengthes of all captions [B, cn]
+                lens: Tensor  # lengths of all captions [B, cn]
 
                 # set progress bar description and metrics
                 pb.set_description(f"{phases[self.train]}: Step-{step + 1:<4d}")
@@ -386,8 +385,8 @@ class Trainer():
                         self.img_embed_optim.step()
                         self.transformer_optim.step()
 
-                # get predections then alculate some metrics
-                preds = torch.argmax(logits, dim=2).cpu()  # predections
+                # get predictions then calculate some metrics
+                preds = torch.argmax(logits, dim=2).cpu()  # predictions
                 targets = cptns_all[:, 1:]  # remove <SOS>
                 scores = self.get_metrics(targets, lens - 1, preds)
                 scores["loss"] = loss.item()  # add loss to metrics scores

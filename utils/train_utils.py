@@ -33,7 +33,7 @@ def parse_arguments() -> Namespace:
     parser.add_argument(
         "--resume",
         type=str,
-        default="0108.0132/checkpoint.pth.tar",
+        default="",
         help='checkpoint filename.')
 
     args = parser.parse_args()

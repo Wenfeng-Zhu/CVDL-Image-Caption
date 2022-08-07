@@ -22,7 +22,7 @@ class ImageEncoder(nn.Module):
         resnet = torchvision.models.resnet101(weights=ResNet101_Weights.DEFAULT)
         self.resnet = nn.Sequential(*list(resnet.children())[:-2])
 
-        self.downsampling = nn.Conv2d(in_channels=2048,
+        self.downSampling = nn.Conv2d(in_channels=2048,
                                       out_channels=embed_dim,
                                       kernel_size=1,
                                       stride=1,
@@ -49,9 +49,9 @@ class ImageEncoder(nn.Module):
         # [B, 3, h, w] -> [B, 2048, h/32=8, w/32=8]
         out = self.resnet(images)  # type: Tensor
 
-        # Downsampling: resnet features size (2048) -> embed_size (512)
+        # Down sampling: reset features size (2048) -> embed_size (512)
         # [B, 2048, 8, 8] -> [B, embed_size=512, 8, 8]
-        out = self.relu(self.bn(self.downsampling(out)))
+        out = self.relu(self.bn(self.downSampling(out)))
 
         # Adaptive image resize: resnet output size (8,8) -> encode_size (14,14)
         #   [B, embed_size=512, 8, 8] ->

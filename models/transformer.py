@@ -13,7 +13,7 @@ class Encoder(nn.Module):
     """
     param:
 
-    layer:      an instance of the EecoderLayer() class
+    layer:      an instance of the EncoderLayer() class
 
     num_layers: the number of decoder-layers
                 int
@@ -22,8 +22,7 @@ class Encoder(nn.Module):
     def __init__(self, layer: EncoderLayer, num_layers: int):
         super().__init__()
         # Make copies of the encoder layer
-        self.layers = nn.ModuleList(
-            [deepcopy(layer) for _ in range(num_layers)])
+        self.layers = nn.ModuleList([deepcopy(layer) for _ in range(num_layers)])
 
     def forward(self, x: Tensor) -> Tensor:
         """
@@ -47,7 +46,7 @@ class Encoder(nn.Module):
 class Decoder(nn.Module):
     """
     param:
-    layer:          an instance of the EecoderLayer() class
+    layer:          an instance of the DecoderLayer() class
 
     vocab_size:     the number of vocabulary
                     int
@@ -113,7 +112,7 @@ class Decoder(nn.Module):
                     Tensor
                     [max_len, batch_size, model_embed_dim]
 
-        attn_all:   Attension weights
+        attn_all:   Attention weights
                     Tensor
                     [layer_num, batch_size, head_num, max_len-1,
                     encode_size^2]
@@ -193,7 +192,7 @@ class Transformer(nn.Module):
                         Tensor
                         [batch_size, max_len, vocab_size]
 
-        attn_all:       Attension weights
+        attn_all:       Attention weights
                         Tensor
                         [layer_num, batch_size, head_num, max_len, encode_size^2]
                         See comments in decoder_layers.DecoderLayer
@@ -204,13 +203,3 @@ class Transformer(nn.Module):
         predictions = self.predictor(tgt_cptn).permute(1, 0, 2)  # type: Tensor
 
         return predictions.contiguous(), attns.contiguous()
-
-
-if __name__ == "__main__":
-
-    src_img = torch.rand(10, 196, 512)  # B, encode, embed
-    captions = torch.randint(0, 52, (10, 30), dtype=torch.long)
-    m_test = Transformer(52, 512, 196, 512, 2048, 2, 8, 8, 8, 30, 0.1, 0)
-    valus, attns = m_test(src_img, captions)
-    print(valus.size())
-    print(attns.size())

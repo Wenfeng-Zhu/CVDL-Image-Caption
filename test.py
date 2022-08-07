@@ -13,8 +13,8 @@ from torchvision.transforms import Normalize, Compose
 from torch.utils.data import DataLoader
 
 from dataset_functional.dataloader import HDF5Dataset, collate_padd
-from models.cnn_encoder import ImageEncoder
-from models.IC_encoder_decoder.transformer import Transformer
+from models.img_cnn_encoder import ImageEncoder
+from models.transformer import Transformer
 from nlg_metrics import Metrics
 from utils.train_utils import seed_everything, load_json
 from utils.test_utils import parse_arguments

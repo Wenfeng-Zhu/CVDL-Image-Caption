@@ -6,8 +6,8 @@ from torchvision.transforms import Normalize, Compose
 from torch.optim import Adam
 from torch.optim.lr_scheduler import StepLR
 
-from models.cnn_encoder import ImageEncoder
-from models.IC_encoder_decoder.transformer import Transformer
+from models.img_cnn_encoder import ImageEncoder
+from models.transformer import Transformer
 
 from dataset_functional.dataloader import HDF5Dataset, collate_padd
 from torchtext.vocab import Vocab
