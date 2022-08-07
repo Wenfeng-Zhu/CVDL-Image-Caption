@@ -84,7 +84,7 @@ class Trainer():
         self.finetune_embedding = embeddings_finetune
         self.pad_id = pad_id
 
-        # criterion, optims and schedulers
+        # criterion, optimizer and schedulers
         self.criterion = nn.CrossEntropyLoss(ignore_index=pad_id).to(device)
         self.img_embed_optim = optims[0]
         self.transformer_optim = optims[1]
@@ -101,10 +101,9 @@ class Trainer():
         self.metrics_tracker = TrackMetrics()
         self.best_metric = 0
 
-        # Some coeffecient
-        # coeffecient of Doubly stochastic attention regularization
+        # Some coefficient of Doubly stochastic attention regularization
         self.lc = lambda_c
-        self.grad_clip_c = grad_clip  # gradient clip coeffecient
+        self.grad_clip_c = grad_clip  # gradient clip coefficient
 
         if resume is None:
             time_tag = str(datetime.now().strftime("%d%m.%H%M"))
@@ -311,7 +310,7 @@ class Trainer():
         # some preparations:
         phases = ["val", "train"]  # to determine the current phase
         seed_everything(SEED)
-        if self.resume:
+        if self.resume is not None:
             model_state_dicts = self.load_checkpoint()
             print("load the resume.")
             img_embeder.load_state_dict(model_state_dicts[0])
