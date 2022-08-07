@@ -11,4 +11,4 @@
 7. [ ] Recording of training process
 8. [ ] Checkpoints saving/loading
 9. [ ] Testing
-10. [ ] Results ouput and analysis 
+10. [ ] Results output and analysis 
