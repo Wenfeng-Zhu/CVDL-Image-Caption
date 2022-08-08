@@ -12,11 +12,6 @@ https://pytorch.org/tutorials/beginner/transformer_tutorial.html#define-the-mode
 class PositionalEncoding(nn.Module):
 
     def __init__(self, d_model: int, max_len: int = 5000):
-        """
-        param:
-            d_model - Hidden dimensionality of the input.
-            max_len - Maximum length of a sequence to expect.
-        """
         super().__init__()
 
         self.d_model = d_model

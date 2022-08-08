@@ -6,8 +6,8 @@ from torchvision.transforms import Normalize, Compose
 from torch.optim import Adam
 from torch.optim.lr_scheduler import StepLR
 
-from models.img_cnn_encoder import ImageEncoder
-from models.transformer import Transformer
+from transformer_model.img_cnn_encoder import ImageEncoder
+from transformer_model.transformer import Transformer
 
 from dataset_functional.dataloader import HDF5Dataset, collate_padd
 from torchtext.vocab import Vocab
@@ -92,8 +92,8 @@ if __name__ == "__main__":
     print("loading processed dataset finished.")
     print(f"number of vocabulary is {vocab_size}\n")
 
-    # --------------- Construct models, optimizers --------------- #
-    print("constructing models")
+    # --------------- Construct transformer_model, optimizers --------------- #
+    print("constructing transformer_model")
     # prepare some hyper-parameters
     image_enc_hyperparams = config["hyperparams"]["image_encoder"]
     image_seq_len = int(image_enc_hyperparams["encode_size"] ** 2)
@@ -104,7 +104,7 @@ if __name__ == "__main__":
     transformer_hyperparams["img_encode_size"] = image_seq_len
     transformer_hyperparams["max_len"] = max_len - 1
 
-    # construct models
+    # construct transformer_model
     image_enc = ImageEncoder(**image_enc_hyperparams)
     image_enc.fine_tune(True)
     transformer = Transformer(**transformer_hyperparams)

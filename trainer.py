@@ -219,8 +219,8 @@ class Trainer():
 
         # load checkpoint
         state = torch.load(load_path, map_location=torch.device("cpu"))
-        image_model_state = state["models"][0]
-        transformer_state = state["models"][1]
+        image_model_state = state["transformer_model"][0]
+        transformer_state = state["transformer_model"][1]
         image_optim_state = state["optims"][0]
         transformer_optim_state = state["optims"][1]
         image_scheduler_state = state["schedulers"][0]
@@ -255,7 +255,7 @@ class Trainer():
         transformer_scheduler_state = self.transformer_scheduler.state_dict()
 
         state = {
-            "models": [image_model_state, Transformer_state],
+            "transformer_model": [image_model_state, Transformer_state],
             "optims": [image_optim_state, transformer_optim_state],
             "schedulers": [image_scheduler_state, transformer_scheduler_state],
             "phase": self.train,
@@ -315,7 +315,7 @@ class Trainer():
             img_embeder.load_state_dict(model_state_dicts[0])
             transformer.load_state_dict(model_state_dicts[1])
 
-        # move models to device
+        # move transformer_model to device
         img_embeder = img_embeder.to(self.device)
         transformer = transformer.to(self.device)
 

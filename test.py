@@ -13,8 +13,8 @@ from torchvision.transforms import Normalize, Compose
 from torch.utils.data import DataLoader
 
 from dataset_functional.dataloader import HDF5Dataset, collate_padd
-from models.img_cnn_encoder import ImageEncoder
-from models.transformer import Transformer
+from transformer_model.img_cnn_encoder import ImageEncoder
+from transformer_model.transformer import Transformer
 from nlg_metrics import Metrics
 from utils.train_utils import seed_everything, load_json
 from utils.test_utils import parse_arguments
@@ -72,8 +72,8 @@ if __name__ == "__main__":
                           shuffle=False)
     print("loading dataset finished.")
 
-    # --------------- Construct models --------------- #
-    print("constructing models.\n")
+    # --------------- Construct transformer_model --------------- #
+    print("constructing transformer_model.\n")
     # prepare some hyperparameters
     image_enc_hyperparms = config["hyperparams"]["image_encoder"]
     h, w = image_enc_hyperparms["encode_size"], image_enc_hyperparms[
@@ -86,14 +86,14 @@ if __name__ == "__main__":
     transformer_hyperparms["img_encode_size"] = image_seq_len
     transformer_hyperparms["max_len"] = max_len - 1
 
-    # construct models
+    # construct transformer_model
     image_enc = ImageEncoder(**image_enc_hyperparms)
     transformer = Transformer(**transformer_hyperparms)
     # load
     load_path = str(Path(checkpoints_dir) / checkpoint_name)
     state = torch.load(load_path, map_location=torch.device("cpu"))
-    image_model_state = state["models"][0]
-    transformer_state = state["models"][1]
+    image_model_state = state["transformer_model"][0]
+    transformer_state = state["transformer_model"][1]
     image_enc.load_state_dict(image_model_state)
     transformer.load_state_dict(transformer_state)
 
@@ -137,7 +137,7 @@ if __name__ == "__main__":
             "gleu": [],
             "meteor": []
         })
-    nlgmetrics = Metrics()
+    nlgMetrics = Metrics()
     bleu4 = []
     pb = tqdm(val_iter, leave=False, total=len(val_iter))
     pb.unit = "step"
@@ -195,7 +195,7 @@ if __name__ == "__main__":
                 log_prob_topk, indexes_topk = log_prob.view(-1).topk(k,
                                                                      sorted=True)
                 # index_topk are a flat indexes, convert them to 2d indexes:
-                # i.e the top k in all log_prob: get indexes: K, next_word_id
+                # i.e. the top k in all log_prob: get indexes: K, next_word_id
                 prev_seq_k, next_word_id = np.unravel_index(
                     indexes_topk.cpu(), log_prob.size())
                 next_word_id = torch.as_tensor(next_word_id).to(device).view(
@@ -236,7 +236,7 @@ if __name__ == "__main__":
         # calculate scores for each prediction
         scores = defaultdict(list)
         for text_pred in text_preds:
-            for k, v in nlgmetrics.calculate([text_refs], [text_pred]).items():
+            for k, v in nlgMetrics.calculate([text_refs], [text_pred]).items():
                 scores[k].append(v)
 
         # save all eval data
