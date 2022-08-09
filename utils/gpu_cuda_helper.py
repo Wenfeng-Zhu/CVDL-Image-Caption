@@ -5,9 +5,9 @@ import torch
 
 
 def get_gpu_memory() -> List[int]:
-    """Get the current gpu usage.
+    """
+    Get the current gpu usage.
     Reference: https://stackoverflow.com/a/49596019
-
     Returns
     -------
     usage: list
@@ -57,8 +57,3 @@ def select_device(device: str = "gpu"):
             return torch.device(f"cuda:{gpus_avail[0][0]}")
         else:
             return torch.device("cpu")
-
-
-if __name__ == "__main__":
-    print(select_device("cpu"))
-    print(select_device("gpu"))
