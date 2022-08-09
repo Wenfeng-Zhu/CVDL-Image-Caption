@@ -12,13 +12,13 @@ from torchtext.vocab import Vocab
 from torchvision.transforms import Normalize, Compose
 from torch.utils.data import DataLoader
 
-from dataset_functional.dataloader import HDF5Dataset, collate_padd
+from functions.dataloader import HDF5Dataset, collate_padd
 from transformer_model.img_cnn_encoder import ImageEncoder
 from transformer_model.transformer import Transformer
-from nlg_metrics import Metrics
-from utils.train_utils import seed_everything, load_json
-from utils.test_utils import parse_arguments
-from utils.gpu_cuda_helper import select_device
+from functions.nlg_metrics import Metrics
+from functions.train_utils import seed_everything, load_json
+from functions.test_utils import parse_arguments
+from functions.gpu_cuda_helper import select_device
 
 if __name__ == "__main__":
     args = parse_arguments()

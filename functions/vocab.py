@@ -4,7 +4,8 @@ from .utils import write_json
 
 
 class DictWithDefault(dict):
-    """Dictionary that return default value if key is missing.
+    """
+    Dictionary that return default value if key is missing.
     example:
         d = {"a": 1, "b": 2, "c": 3, "d": 4}
         dd = DictWithDefault("default", d)

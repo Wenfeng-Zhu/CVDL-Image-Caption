@@ -21,7 +21,7 @@ This file is used to store some processing functions for the dataset
 
 from typing import List, Tuple
 from numpy.typing import NDArray
-from .customised_data_types import Captions, ImagesAndCaptions, BOW
+from custom_types import Captions, ImagesAndCaptions, BOW
 
 from collections import defaultdict, Counter
 from itertools import chain

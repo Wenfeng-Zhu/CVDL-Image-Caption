@@ -25,7 +25,8 @@ def get_gpu_memory() -> List[int]:
 
 
 def get_gpus_avail() -> List[Tuple[int, float]]:
-    """Get the GPU ids that have memory usage less than or equal to 40%
+    """
+    Get the GPU ids that have memory usage less than or equal to 40%
     """
     memory_usage = get_gpu_memory()
 

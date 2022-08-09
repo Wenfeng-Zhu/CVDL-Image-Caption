@@ -1,5 +1,5 @@
 import os
-from dataset_functional.customised_data_types import ImagesAndCaptions
+from functions.custom_types import ImagesAndCaptions
 from argparse import Namespace
 
 from pathlib import Path
@@ -7,12 +7,12 @@ from itertools import chain
 
 import torch
 
-from utils.train_utils import seed_everything
-from dataset_functional.utils import parse_arguments, load_json, write_h5_dataset
-from dataset_functional.utils import write_json
-from dataset_functional.dataset_processor import get_captions, combine_image_captions
-from dataset_functional.dataset_processor import run_create_arrays
-from dataset_functional.dataset_processor import split_dataset, build_vocab
+from functions.train_utils import seed_everything
+from functions.utils import parse_arguments, load_json, write_h5_dataset
+from functions.utils import write_json
+from functions.dataset_processor import get_captions, combine_image_captions
+from functions.dataset_processor import run_create_arrays
+from functions.dataset_processor import split_dataset, build_vocab
 
 
 def load_data(json_path: str,
