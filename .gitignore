@@ -127,3 +127,9 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+/checkpoints/
+/datasets-original/
+/datasets-processed/
+/embeddings/
+/.vector_cache/
+/test_output/

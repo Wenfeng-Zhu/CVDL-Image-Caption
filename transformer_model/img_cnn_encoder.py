@@ -5,7 +5,7 @@ from torchvision.models import ResNet101_Weights
 
 class ImageEncoder(nn.Module):
 
-    def __init__(self, encode_size=14, embed_dim=512):
+    def __init__(self, encode_size=16, embed_dim=512):
         """
         param:
         encode_size:    encoded image size.

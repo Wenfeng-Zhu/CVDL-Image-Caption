@@ -58,6 +58,7 @@ def load_datasets(dataset_processed_dir: str, pid_pad: float):
 
     return train_dataset, val_dataset
 
+
 class TrackMetrics:
 
     def __init__(self) -> None:
@@ -90,7 +91,7 @@ class TrackMetrics:
         self.reset_running()
 
 
-class Trainer():
+class Trainer:
 
     def __init__(self,
                  optims: List[OptimType],
@@ -462,6 +463,7 @@ class Trainer():
                 print(f"Early stop training at epoch {self.epoch}")
                 break
 
+
 if __name__ == "__main__":
 
     # parse command arguments
@@ -558,4 +560,3 @@ if __name__ == "__main__":
     train.run(image_enc, transformer, [train_iter, val_iter], SEED)
 
     print("done")
-

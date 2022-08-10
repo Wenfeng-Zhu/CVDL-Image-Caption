@@ -19,10 +19,16 @@ class Encoder(nn.Module):
                 int
     """
 
-    def __init__(self, layer: EncoderLayer, num_layers: int):
+    def __init__(self,
+                 layer: EncoderLayer,
+                 num_layers: int,
+                 img_encode_size: int,
+                 embed_dim: int
+                 ):
         super().__init__()
         # Make copies of the encoder layer
         self.layers = nn.ModuleList([deepcopy(layer) for _ in range(num_layers)])
+        self.pos_emb = PositionalEncoding(d_model=embed_dim, max_len=img_encode_size)
 
     def forward(self, x: Tensor) -> Tensor:
         """
@@ -36,10 +42,10 @@ class Encoder(nn.Module):
             Tensor
             [encode_size^2, batch_size, model_embed_dim]
         """
-
+        x = self.pos_emb(x.permute(1, 0, 2))
+        x = x.permute(1, 0, 2)
         for layer in self.layers:
             x = layer(x)
-
         return x
 
 
@@ -166,7 +172,11 @@ class Transformer(nn.Module):
                                      num_heads=dec_n_heads,
                                      feedforward_dim=dec_ff_dim,
                                      dropout=dropout)
-        self.encoder = Encoder(layer=encoder_layer, num_layers=enc_n_layers)
+        self.encoder = Encoder(layer=encoder_layer,
+                               num_layers=enc_n_layers,
+                               img_encode_size=img_encode_size,
+                               embed_dim=d_model,
+                               )
         self.decoder = Decoder(layer=decoder_layer,
                                vocab_size=vocab_size,
                                d_model=d_model,
@@ -182,7 +192,7 @@ class Transformer(nn.Module):
         """
         param:
         image:      source images
-                    [batch_size, encode_size^2=196, image_feature_size=512]
+                    [batch_size, encode_size^2=256, image_feature_size=512]
 
         captions:   target captions
                     [batch_size, max_len-1=51]

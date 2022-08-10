@@ -1,7 +1,7 @@
 {
     "hyperparams": {
         "image_encoder": {
-            "encode_size": 14,
+            "encode_size": 16,
             "embed_dim": 512
         },
         "transformer": {
