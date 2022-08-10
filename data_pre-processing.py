@@ -13,6 +13,7 @@ from functions.utils import write_json
 from functions.dataset_processor import get_captions, combine_image_captions
 from functions.dataset_processor import run_create_arrays
 from functions.dataset_processor import split_dataset, build_vocab
+from torchtext.vocab import Vocab
 
 
 def load_data(json_path: str,
@@ -69,6 +70,8 @@ if __name__ == "__main__":
 
     # Create vocab from train dataset_functional set OOV to <UNK>, then encode captions
     captions = [chain.from_iterable(d["captions"]) for d in train_ds.values()]
+    # myvec = GloVe()
+    # myvocab = vocab(myvec.stoi)
     vocab = build_vocab(captions, str(vector_dir), vector_name, args.min_freq)
     print("Processing finished.\n")
 

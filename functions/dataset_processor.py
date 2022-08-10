@@ -21,7 +21,7 @@ This file is used to store some processing functions for the dataset
 
 from typing import List, Tuple
 from numpy.typing import NDArray
-from custom_types import Captions, ImagesAndCaptions, BOW
+from functions.custom_types import Captions, ImagesAndCaptions, BOW
 
 from collections import defaultdict, Counter
 from itertools import chain
@@ -144,6 +144,13 @@ def build_vocab(captions: List[chain],
                          vectors_cache=vector_dir,
                          vectors=vector_name,
                          unk_init=init_unk)
+    # first_vocab = build_vocab_from_iterator(all_words, min_freq=min_freq, specials=("<unk>", "<pad>", "<sos>", "<eos>"))
+    # myvec = GloVe(name='6B', dim=300, )
+    # myvocab = vocab(myvec.stoi)
+    # myvocab.insert_token('<unk>', 0)
+    # myvocab.insert_token('<pad>', 1)
+    # myvocab.insert_token('<sos>', 2)
+    # myvocab.insert_token('<eos>', 3)
     return vocab
 
 
@@ -160,7 +167,6 @@ def run_create_arrays(
         dataset: ImagesAndCaptions,
         vocab: Vocab,
         split: str,
-        num_proc: int = 4
 ) -> Tuple[NDArray, List[List[List[int]]], List[List[int]]]:
     # Prepare arrays: images, captions encoded and captions lengths
     f = partial(create_input_arrays, vocab=vocab)
