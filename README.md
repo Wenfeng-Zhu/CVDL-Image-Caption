@@ -37,7 +37,7 @@ Or you can go to the file `CVDL-Image-Caption\functions\utils.py` to edit the pa
 
 ## 4. Data Pre-Processing
 
-Once you have the above dataset ready and the directories set, you can run:\
+Once you have the above dataset ready and the directories set, you can run:
 ```
 CVDL-Image-Caption\data_pre-processing.py
 ```
