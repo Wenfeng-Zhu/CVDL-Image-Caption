@@ -29,10 +29,9 @@ the version we used in this project is GloVe.6B.300.
 
 ## 3. Directories
 You can choose to create the following directories under this project:
-1. `CVDL-Image-Caption\datasets-original`: The folder used to store three coco datasets: `train2017`, `val2017` 
-2. and `annotations_trainval2017`
-3. `CVDL-Image-Caption\embeddings`: Used to store GloVe word vectors
-4. `CVDL-Image-Caption\datasets-processed`: Directory to save the processed datasets
+1. `CVDL-Image-Caption\datasets-original`: The folder used to store three coco datasets: `train2017`, `val2017` and `annotations_trainval2017`
+2. `CVDL-Image-Caption\embeddings`: Used to store GloVe word vectors
+3. `CVDL-Image-Caption\datasets-processed`: Directory to save the processed datasets
 
 Or you can go to the file `CVDL-Image-Caption\functions\utils.py` to edit the path information, make it point to the path you want.
 
