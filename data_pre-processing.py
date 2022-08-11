@@ -48,13 +48,6 @@ if __name__ == "__main__":
     val_imgs_dir = str(ds_dir / args.image_val)  # validation images path
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    """
-    torchtext.vocab
-    Vector must be one of the vectors supported by
-    torchtext.vocab.Vectors classes
-    https://github.com/pytorch/text/blob/0169cde2f1d446ae886ef0be07e9a673585ed256/torchtext/vocab.py#L151
-    """
-
     vector_dir = Path(os.path.expanduser(args.vector_dir))
     vector_name = list(vector_dir.glob("*.zip"))  # dir must have one zip file
     vector_name = f"{vector_name[0].name.strip('.zip')}.{args.vector_dim}d"

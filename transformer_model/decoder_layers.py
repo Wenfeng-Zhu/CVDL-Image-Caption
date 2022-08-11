@@ -54,13 +54,7 @@ class DecoderLayer(nn.Module):
 
         attn:           Attention weights
                         Tensor
-                        [layer_num, batch_size, head_num, max_len, encode_size^2]
-                        To be able to do so, I have changed the code at
-                        /.virtualenvs/<env_name>/lib/python3.8/site-packages/torch/nn/functional.py
-                        line 4818 and changed
-                        `return attn_output, attn_output_weights.sum(dim=1) /
-                        num_heads` to be
-                        `return attn_output, attn_output_weights`
+                        [layer_num, batch_size, max_len, encode_size^2]
 
         """
         output, _ = self.dec_self_attn(dec_inputs,

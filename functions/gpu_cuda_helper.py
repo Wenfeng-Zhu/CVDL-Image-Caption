@@ -5,19 +5,10 @@ import torch
 
 
 def get_gpu_memory() -> List[int]:
-    """
-    Get the current gpu usage.
-    Reference: https://stackoverflow.com/a/49596019
-    Returns
-    -------
-    usage: list
-        Values of memory usage per GPU as integers in MB.
-    """
     result = subprocess.check_output([
         'nvidia-smi', '--query-gpu=memory.used',
         '--format=csv,nounits,noheader'
     ])
-    # Convert lines into a dictionary
     result = result.decode('utf-8')
     gpu_memory = [int(x) for x in result.strip().split('\n')]
 
@@ -25,9 +16,6 @@ def get_gpu_memory() -> List[int]:
 
 
 def get_gpus_avail() -> List[Tuple[int, float]]:
-    """
-    Get the GPU ids that have memory usage less than or equal to 40%
-    """
     memory_usage = get_gpu_memory()
 
     memory_usage_percnt = [m / 11178 for m in memory_usage]

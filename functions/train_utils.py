@@ -54,5 +54,4 @@ def seed_everything(seed=42):
 def load_json(json_path: str) -> dict:
     with open(json_path) as json_file:
         data = json.load(json_file)
-
     return data

@@ -121,7 +121,6 @@ def write_h5_dataset(write_path: str, data: NDArray, name: str,
 
 
 def seed_worker(worker_id):
-    # ref: https://pytorch.org/docs/stable/notes/randomness.html
     worker_seed = torch.initial_seed() % 2 ** 32
     np.random.seed(worker_seed)
     random.seed(worker_seed)

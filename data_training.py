@@ -6,7 +6,7 @@ from torch.optim.lr_scheduler import StepLR
 from transformer_model.img_cnn_encoder import ImageEncoder
 from transformer_model.transformer import Transformer
 
-from functions.dataloader import HDF5Dataset, collate_padd
+from functions.dataloader import HDF5Dataset, collate_pad
 from torchtext.vocab import Vocab
 
 from functions.train_utils import parse_arguments, load_json
@@ -164,17 +164,10 @@ class Trainer:
 
         # Doubly stochastic attention regularization:
         # "Show, Attend and Tell" - arXiv:1502.03044v3 eq(14)
-        # change atten size to be
-        # [layer_num, head_num, batch_size, max_len, encode_size^2]
+        # change attention size to be [layer_num, batch_size, max_len, encode_size^2]
         attns = attns.permute(0, 1, 2, 3)
         ln, hn = attns.size()[:2]  # number of layers, number of heads
 
-        # calc λ(1-∑αi)^2 for each pixel in each head in each layer
-        # alphas [layer_num, head_num, batch_size*encode_size^2]
-        # TODO:
-        # Reduction: Would it make any difference if I sum across
-        # (encode_size^2, and head) dimensions and average across batch and
-        # layers?
         alphas = self.lc * (1. - attns.view(ln, hn, -1)) ** 2
         alphas: Tensor
         dsar = alphas.mean(-1).sum()
@@ -200,8 +193,6 @@ class Trainer:
             tensor = tensor.permute(0, 2, 1).contiguous().view(-1, max_len)
             mask = mask.permute(0, 2, 1).contiguous().view(-1, max_len)
 
-        # Remove pads: select elements that are not equal to pad (into 1d
-        # tensor) then split the formed 1d tensor according to lengthes
         tensor = torch.masked_select(tensor, mask=mask)
         tensor = torch.split(tensor, split_size_or_sections=lens.tolist())
         tensor = [[str(e.item()) for e in t] for t in tensor]
@@ -320,7 +311,6 @@ class Trainer:
         current_metric = {f"{phase}": metrics_dict["gleu"][-1]}
         self.gleu_logger.add_scalars("gleu", current_metric, self.epoch)
 
-        # Plot all metrics except loss and bleu4
         if not self.train:
             ex = ["loss", "bleu4", "gleu"]
             name_tag = "Metrics Validation"
@@ -332,17 +322,7 @@ class Trainer:
 
     def run(self, img_embeder: ModelType, transformer: ModelType,
             data_iters: DataIterType, SEED: int):
-        # Sizes:
-        # B:   batch_size
-        # is:  image encode size^2: image seq len: [default=196]
-        # vsc: vocab_size: vsz
-        # lm:  max_len: [default=52]
-        # cn:  number of captions: [default=5]
-        # hn:  number of transformer heads: [default=8]
-        # ln:  number of layers
-        # k:   Beam Size
 
-        # some preparations:
         phases = ["val", "train"]  # to determine the current phase
         seed_everything(SEED)
         if self.resume is not None:
@@ -351,11 +331,9 @@ class Trainer:
             img_embeder.load_state_dict(model_state_dicts[0])
             transformer.load_state_dict(model_state_dicts[1])
 
-        # move transformer_model to device
         img_embeder = img_embeder.to(self.device)
         transformer = transformer.to(self.device)
 
-        # start
         main_pb = tqdm(range(1, self.epochs_num + 1))
         while self.epoch <= self.epochs_num:
 
@@ -369,8 +347,6 @@ class Trainer:
                 img_embeder.train()
                 transformer.train()
                 data_iter = data_iters[0]
-                # fine tune the embeddings layer after some epochs and add the
-                # parameters to the optimizer
                 if self.epoch == self.finetune_embedding:
                     for p in transformer.decoder.cptn_emb.parameters():
                         p.requires_grad = True
@@ -380,81 +356,63 @@ class Trainer:
                 transformer.eval()
                 data_iter = data_iters[1]
 
-            # Iterate over data
-            # progress bar
             data_iter
             pb = tqdm(data_iter, leave=False, total=len(data_iter))
             pb.unit = "step"
             for step, (imgs, cptns_all, lens) in enumerate(pb):
-                imgs: Tensor  # images [B, 3, 256, 256]
-                cptns_all: Tensor  # all 5 captions [B, lm, cn=5]
-                lens: Tensor  # lengths of all captions [B, cn]
+                imgs: Tensor
+                cptns_all: Tensor
+                lens: Tensor
 
-                # set progress bar description and metrics
                 pb.set_description(f"{phases[self.train]}: Step-{step + 1:<4d}")
 
-                # move data to device, and random selected cptns
                 imgs = imgs.to(self.device)
-                # random selected cptns: [B, lm]
+
                 idx = np.random.randint(0, cptns_all.size(-1))
                 cptns = cptns_all[:, :, idx].to(self.device)
 
-                # zero the parameter gradients
                 self.img_embed_optim.zero_grad()
                 self.transformer_optim.zero_grad()
 
                 with torch.set_grad_enabled(self.train):
-                    # embed images using CNN then get logits prediction using
-                    # the transformer
                     imgs = img_embeder(imgs)
                     logits, attns = transformer(imgs, cptns[:, :-1])
-                    logits: Tensor  # [B, lm - 1, vsz]
-                    attns: Tensor  # [ln, B, hn, lm, is]
-
-                    # loss calc, backward
+                    logits: Tensor
+                    attns: Tensor
                     loss = self.loss_fn(logits, cptns[:, 1:], attns)
-
-                    # in train, gradient clip + update weights
                     if self.train:
                         loss.backward()
                         self.clip_gradient()
                         self.img_embed_optim.step()
                         self.transformer_optim.step()
 
-                # get predictions then calculate some metrics
-                preds = torch.argmax(logits, dim=2).cpu()  # predictions
-                targets = cptns_all[:, 1:]  # remove <SOS>
+                preds = torch.argmax(logits, dim=2).cpu()
+                targets = cptns_all[:, 1:]
                 scores = self.get_metrics(targets, lens - 1, preds)
-                scores["loss"] = loss.item()  # add loss to metrics scores
+                scores["loss"] = loss.item()
                 self.metrics_tracker.update_running(scores, phases[self.train])
 
-                # step ended
-                # update progress bar
-                # pb.update(1)
 
             self.metrics_tracker.update(phases[self.train])  # save metrics
             if not self.train:
                 checked_metric = self.metrics_tracker.metrics["val"]["bleu4"]
                 is_best, lr_r, es = self.check_improvement(checked_metric[-1])
 
-                if lr_r:  # reduce lr
+                if lr_r:
                     self.image_scheduler.step()
                     self.transformer_scheduler.step()
 
-            # save checkpoint
             if self.train or is_best:
                 self.save_checkpoint(models=[img_embeder, transformer],
                                      is_best=is_best)
 
-            # PLot metrics
             phase = phases[self.train]
             metrics_dict = self.metrics_tracker.metrics[phase]
             self.plot_data(phase, metrics_dict)
 
-            # epoch ended
-            self.set_phase()  # set train or vall phase
+            self.set_phase()
             self.epoch += 1 * self.train
-            pb.close()  # close progress bar
+            pb.close()
             if self.train:
                 main_pb.update(1)
             if es:  # early stopping
@@ -465,7 +423,6 @@ class Trainer:
 
 if __name__ == "__main__":
 
-    # parse command arguments
     args = parse_arguments()
     dataset_dir = args.dataset_dir  # MS COCO hdf5 and json files
     resume = args.resume
@@ -497,19 +454,17 @@ if __name__ == "__main__":
     max_len = config["max_len"]
     train_ds, val_ds = load_datasets(dataset_dir, pad_id)
     train_iter = DataLoader(train_ds,
-                            collate_fn=collate_padd(max_len, pad_id),
+                            collate_fn=collate_pad(max_len, pad_id),
                             pin_memory=True,
                             **loader_params)
     val_iter = DataLoader(val_ds,
-                          collate_fn=collate_padd(max_len, pad_id),
+                          collate_fn=collate_pad(max_len, pad_id),
                           batch_size=1,
                           pin_memory=True,
                           num_workers=0,
                           shuffle=True)
     print("loading processed dataset finished.")
     print(f"number of vocabulary is {vocab_size}\n")
-
-    # --------------- Construct transformer_model, optimizers --------------- #
     print("constructing transformer_model")
     # prepare some hyper-parameters
     image_enc_hyperparams = config["hyperparams"]["image_encoder"]

@@ -59,7 +59,7 @@ class Metrics:
         self.bleu4 = BLUE(ngrams=4)
 
         self.gleu = GLEU()
-        meteor = METEOR()  # need nltk.download('omw-1.4')
+        meteor = METEOR()
 
         self.all = [bleu1, bleu2, bleu3, self.bleu4, self.gleu, meteor]
 

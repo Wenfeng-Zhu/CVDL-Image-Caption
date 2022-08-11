@@ -42,8 +42,10 @@ class Encoder(nn.Module):
             Tensor
             [encode_size^2, batch_size, model_embed_dim]
         """
-        x = self.pos_emb(x.permute(1, 0, 2))
-        x = x.permute(1, 0, 2)
+
+        # x = self.pos_emb(x.permute(1, 0, 2))
+        # x = x.permute(1, 0, 2)
+        # This part decides if do positional encoding
         for layer in self.layers:
             x = layer(x)
         return x

@@ -29,25 +29,20 @@ import multiprocessing as mp
 from functools import partial
 from tqdm import tqdm
 import re
-
 import numpy as np
 from torchtext.vocab import Vocab
-
 from sklearn.model_selection import train_test_split
-
 import cv2
-
-from .utils import init_unk
+from utils import init_unk
 
 
 def get_captions(annotations: list, max_len: int) -> Captions:
-    # collect captions by image id
+
     captions_dict = defaultdict(list)
     for annot in annotations:
         captions = [
             s for s in re.split(r"(\W)", annot["caption"]) if s.strip()
         ]
-        # Truncate if len > max_len - 2 (<sos> and <eos>)
         if len(captions) > (max_len - 2):
             captions = captions[:max_len - 2]
 
@@ -57,9 +52,7 @@ def get_captions(annotations: list, max_len: int) -> Captions:
     return captions_dict
 
 
-def combine_image_captions(images: List[str], captions_dict: Captions,
-                           images_dir: str) -> ImagesAndCaptions:
-    # collect image and captions
+def combine_image_captions(images: List[str], captions_dict: Captions, images_dir: str) -> ImagesAndCaptions:
     images_w_captions = {}
     for img in images:
         img_id = img["id"]
@@ -104,25 +97,19 @@ def split_dataset(
         test_perc: int = 0.15,
         val_perc: int = 0.15
 ) -> Tuple[ImagesAndCaptions, ImagesAndCaptions, ImagesAndCaptions]:
-    train_perc = 1 - (test_perc + val_perc)  # training %
+    train_perc = 1 - (test_perc + val_perc)
     original_val_size = len(original_val_split)
     original_train_size = len(original_train_split)
-    ds_size = original_val_size + original_train_size  # original dataset size
-
-    # Calculate the remaining size to have 15% of test split (original_val + test_makeup)
+    ds_size = original_val_size + original_train_size
     test_makeup_size = int(ds_size * val_perc) - original_val_size
     train_size = int((train_perc / (1 - test_perc)) *
                      (ds_size - original_val_size - test_makeup_size))
-
     original_train_list = list(original_train_split.items())
     test_makeup, train_val = train_test_split(original_train_list,
                                               train_size=test_makeup_size,
                                               random_state=SEED,
                                               shuffle=True)
-
-    test_split = {**dict(test_makeup), **original_val_split}  # merge two dicts
-
-    # Split the remaining to have test, train: 15%, 70%
+    test_split = {**dict(test_makeup), **original_val_split}
     train_split, val_split = train_test_split(train_val,
                                               train_size=train_size,
                                               random_state=SEED,
@@ -168,7 +155,6 @@ def run_create_arrays(
         vocab: Vocab,
         split: str,
 ) -> Tuple[NDArray, List[List[List[int]]], List[List[int]]]:
-    # Prepare arrays: images, captions encoded and captions lengths
     f = partial(create_input_arrays, vocab=vocab)
     num_proc = mp.cpu_count()
     with mp.Pool(processes=num_proc) as pool:
