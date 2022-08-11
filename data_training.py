@@ -119,8 +119,7 @@ class Trainer:
         self.stop = early_stop
         # number of validation epochs in which model doesn't improve
         self.bad_epochs_num = 0
-        # number of validation epochs to wait before decreases the lr if model
-        # does not improve
+        # number of validation epochs to wait before decreases the lr if model does not improve
         self.lr_patience = lr_patience
         # start tune embeddings after n training epochs have beed passed
         self.finetune_embedding = embeddings_finetune
@@ -167,7 +166,7 @@ class Trainer:
         # "Show, Attend and Tell" - arXiv:1502.03044v3 eq(14)
         # change atten size to be
         # [layer_num, head_num, batch_size, max_len, encode_size^2]
-        attns = attns.permute(0, 2, 1, 3, 4)
+        attns = attns.permute(0, 1, 2, 3)
         ln, hn = attns.size()[:2]  # number of layers, number of heads
 
         # calc λ(1-∑αi)^2 for each pixel in each head in each layer
@@ -176,7 +175,7 @@ class Trainer:
         # Reduction: Would it make any difference if I sum across
         # (encode_size^2, and head) dimensions and average across batch and
         # layers?
-        alphas = self.lc * (1. - attns.sum(dim=3).view(ln, hn, -1)) ** 2
+        alphas = self.lc * (1. - attns.view(ln, hn, -1)) ** 2
         alphas: Tensor
         dsar = alphas.mean(-1).sum()
 

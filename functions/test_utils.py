@@ -23,7 +23,8 @@ def parse_arguments() -> Namespace:
 
     parser.add_argument("--checkpoint_name",
                         type=str,
-                        default="0108.0132/checkpoint_best.pth.tar",
+                        # default="0108.0132/checkpoint_best.pth.tar",
+                        default="1108.0156/checkpoint_best.pth.tar",
                         help="Path for the checkpoint file.")
 
     parser.add_argument(
