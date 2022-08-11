@@ -58,6 +58,7 @@ This project is carried out under the following hardware.
 |     CPU     | Intel(R) Core(TM) i7-10700F CPU \@ 2.90GHz |
 |     GPU     | NVIDIA GeForce RTX 3080 10GB |
 | Memory(RAM) | Kingston FURY Renegade 64GB (2x32GB) 3600MHz DDR4|
+
 Note: We do not recommend reproducing this project on a normally configured PC.
 ### 4.3 Run Training
 Once you have set everything you need, you can run:\
@@ -88,10 +89,12 @@ The output of testing will be stored as `JSON` files in directory `CVDL-Image-Ca
 
 
 ## 6. Output examples
-<div align="center"><img src="project_images/image-1.jpg"></div> 
-<center>Output Text => A couple of women sitting on top of a bench.</center>
-<div align="center"><img src="project_images/image-2.jpg"></div>
-<center>Output Text => A bunch of green bananas sitting next to each other</center>
+<img src="project_images/image-1.jpg">
+Output Text => A couple of women sitting on top of a bench.
+
+
+<img src="project_images/image-2.jpg">
+Output Text => A bunch of green bananas sitting next to each other.
 
 
 
