@@ -61,7 +61,7 @@ This project is carried out under the following hardware.
 
 Note: We do not recommend reproducing this project on a normally configured PC.
 ### 4.3 Run Training
-Once you have set everything you need, you can run:\
+Once you have set everything you need, you can run:
 ```
 CVDL-Image-Caption\data_training.py
 ```
