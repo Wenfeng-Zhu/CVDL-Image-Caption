@@ -1,5 +1,5 @@
 # CVDL-Image-Caption
-This repository host the project of WS222/23 Course "Computer Vision and Deep Learning: Visual Synthesis" of Ludwig Maximilian University of Munich.\
+This repository host the project of SS2022 Course "Computer Vision and Deep Learning: Visual Synthesis" of Ludwig Maximilian University of Munich.\
 In this project, a small-scale CNN+Transformer model was constructed for the image caption generation task.\
 As this repository does not contain any datasets, output files or checkpoint files for the model. Therefore this README is intended to provide guidance on how to reproduce the project.
 
